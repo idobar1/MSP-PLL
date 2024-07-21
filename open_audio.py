@@ -2,7 +2,7 @@ from pydub import AudioSegment
 import numpy as np
 import scipy.signal as ss
 import matplotlib.pyplot as plt 
-from utils import *
+from math_utils import *
 
 fname = "Heart Of Glass.wav"
 format = 'wav'
