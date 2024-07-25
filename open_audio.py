@@ -1,8 +1,11 @@
 from pydub import AudioSegment
 import numpy as np
-import scipy.signal as ss
 import matplotlib.pyplot as plt 
 from math_utils import *
+import sounddevice as sd
+
+from scipy.io.wavfile import write as write_wav
+from pydub.playback import play
 
 fname = "Heart Of Glass.wav"
 format = 'wav'
@@ -18,20 +21,33 @@ fs = audio.frame_rate
 left_ch = samples[::2]
 right_ch = samples[1::2]
 
-# taking the first minute only
+# taking few secs only
 # Could be done using pydub library also
-left_ch = left_ch[:(fs*60)] 
-t = np.arange(0,60,1/fs)
+#TODO: move to parameters dedicated file
+cut_len_sec = 10
+cut_start_sec = 60
+cut_stop_sec = cut_start_sec+cut_len_sec
+left_ch = left_ch[(cut_start_sec*fs):(fs*cut_stop_sec)] 
+t = np.arange(0,cut_len_sec,1/fs)
 
-left_ch = left_ch/np.max(left_ch) #normalize to avoid overflow in processing
+s_t = left_ch/np.max(left_ch) #normalize to avoid overflow in processing
+O_t = onset_func(s_t)
+x_t = PLL(O_t,fs)
+
+x_t_audio = AudioSegment(
+    ((x_t*32767).astype('int16')).tobytes(), 
+    frame_rate=fs,
+    sample_width=samples.dtype.itemsize, 
+    channels=1)
+x_t_audio.export("x_t.wav", format="wav")
+sd.play(x_t, fs)
+
+
 
 plt.figure(1)
 plt.title("Welch PSD Estimation")
-plot_est_spectrum(left_ch,fs,4096)
-
-
+plot_est_spectrum(s_t,fs,4096)
 plt.figure(2)
-O_t = onset_func(left_ch)
 plt.plot(t,O_t)
 plt.title('Onset Function')
 plt.show()
