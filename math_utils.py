@@ -12,12 +12,14 @@ class FiltType(StrEnum):
     GAIN = "GAIN"
 
 
-loop_gain       = 5
+loop_gain       = 0.5
 loop_filt_type  = FiltType.MA
-loop_filter_mem = 1
+loop_filter_mem = 20500
 VCO_gain        = 2*np.pi/100 
-f0              = 3 #[Hz]
+f0              = 2.5 #[Hz]
 
+def synth_square(t_vec,f,d_c=0.5):
+    return ss.square(2 * np.pi * f * t_vec, d_c)
 
 def plot_est_spectrum(x,fs,nperseg=65536):
     f, Pxx_left = ss.welch(x,fs,nperseg=nperseg)
@@ -33,6 +35,7 @@ def onset_func(s_t):
     dE_pos = np.diff(E,append=0)
     dE_pos[dE_pos<0] = 0
     O_t = dE_pos-np.mean(dE_pos) #remove "DC"
+    # O_t = dE_pos # Without removing the DC
     return O_t
 
 
@@ -64,6 +67,7 @@ def VCO(e_t,x_phase_t,VCO_gain):
 def PLL(Onsets,fs): ## TODO: Implement
     x = np.zeros(Onsets.shape) 
     x_phase = np.zeros(Onsets.shape)
+    inst_f = np.zeros(Onsets.shape)
     theta = np.zeros(Onsets.shape) 
     e = np.zeros(Onsets.shape)
     #Random phase init
@@ -74,12 +78,25 @@ def PLL(Onsets,fs): ## TODO: Implement
     for n in range(len(Onsets)-1):
         theta[n] = phase_comp(Onsets[n],x[n])
         e[n] = loop_filter(theta,n,loop_filt_type,T=loop_filter_mem)     
-        x_phase[n+1] = VCO(e[n],x_phase[n], VCO_gain)       
-        x[n+1] = np.sin(np.unwrap([2*np.pi*f0*n/fs+x_phase[n+1]]))
-        # x[t+1] = np.sin(np.unwrap([x_phase[t+1]]))
-        
+        x_phase[n+1] = VCO(e[n],x_phase[n], VCO_gain) 
+        inst_f[n+1]  = f0 + + (x_phase[n+1] - x_phase[n])*fs/(2*np.pi)    
+        x[n+1] = np.sin(np.unwrap([2*np.pi*f0*n/fs+x_phase[n+1]]))       
         if(n%10000==0): ## For debug
             print(n/10000)
-    return x
+    return e, x
+
+def zero_cross_detect(x):
+    zc_vec = np.zeros(x.shape)
+    zc_vec[x>0] = 1
+    zc_vec=np.diff(zc_vec)
+    zc_vec[zc_vec<0]=0
+    return zc_vec
+
+def metronome_thresholding(x,th=0.999):
+    metronome = np.zeros(x.shape)
+    metronome[x>th]=1
+    return metronome
+    
+    
 
     
