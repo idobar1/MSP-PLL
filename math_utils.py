@@ -1,9 +1,9 @@
 import numpy as np
 import scipy.signal as ss
 import matplotlib.pyplot as plt 
-from config import Config
+# from config import Config
 ## TODO: Edit parameters to reasonable value when known
-MathConfig = Config.MathConfig
+# MathConfig = Config.MathConfig
 
 def normalize_signal(samples):
     return samples/np.max(samples)
@@ -87,3 +87,13 @@ def metronome_thresholding(x,th=0.999):
     metronome[x>th]=1
     return metronome
     
+def sync_metronome_onsets(onsets,metronome):
+    max_ix_onsets = np.argmax(onsets)
+    possible_delays = (np.where(metronome>0)[0])-max_ix_onsets
+    delay_ix = np.argmin(np.abs(possible_delays))
+    delay = possible_delays[delay_ix]
+
+    return delay
+## TODO: use np.roll(metronome,delay)
+
+
