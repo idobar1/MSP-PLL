@@ -1,15 +1,15 @@
 import numpy as np
 import scipy.signal as ss
 import matplotlib.pyplot as plt 
-# from config import Config
+from config import Config
 ## TODO: Edit parameters to reasonable value when known
-# MathConfig = Config.MathConfig
+MathConfig = Config.MathConfig
 
 def normalize_signal(samples):
     return samples/np.max(samples)
 
 def synth_square(t_vec,f,d_c=0.5):
-    return ss.square(2 * np.pi * f * t_vec, d_c)
+    return (ss.square(2 * np.pi * f * t_vec, d_c)*2-1)
 
 def plot_est_spectrum(x,fs,nperseg=65536):
     f, Pxx_left = ss.welch(x,fs,nperseg=nperseg)
@@ -95,5 +95,3 @@ def find_metronome_delay(onsets,metronome):
 
     return delay
 ## TODO: use np.roll(metronome,delay)
-
-
