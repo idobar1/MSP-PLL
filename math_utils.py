@@ -99,3 +99,10 @@ def sync_metronome(metronome, onset, fs, num_of_sec_trim):
     metronome_delay = find_metronome_delay(metronome[-start_val:], onset[-start_val:])
     metronome_synched = np.roll(metronome, -metronome_delay)
     return metronome_synched
+
+def add_metronome_with_sound(metronome, signal, t, fs):
+    m_t = np.convolve(metronome, np.ones((int(fs*0.1))), mode="same" )
+    m_t_mod = np.multiply(m_t, np.cos(2*np.pi*440*t) + 0.25*np.cos(2*np.pi*440*3/2*t) + 0.1*np.cos(2*np.pi*440*5/4*t))
+    m_t_mod = 2*m_t_mod/np.max(np.abs(m_t_mod))
+    x_t_save_2 = m_t_mod + signal
+    return m_t_mod, x_t_save_2
