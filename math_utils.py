@@ -8,7 +8,7 @@ def normalize_signal(samples):
     return samples/np.max(samples)
 
 def synth_square(t_vec,f,d_c=0.5):
-    return (ss.square(2 * np.pi * f * t_vec, d_c)*2-1)
+    return ((ss.square(2 * np.pi * f * t_vec, d_c) + 1)/2)
 
 def plot_est_spectrum(x,fs,nperseg=65536):
     f, Pxx_left = ss.welch(x,fs,nperseg=nperseg)
