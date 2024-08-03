@@ -87,7 +87,7 @@ def metronome_thresholding(x,th=0.999):
     metronome[x>th]=1
     return metronome
     
-def sync_metronome_onsets(onsets,metronome):
+def find_metronome_delay(onsets,metronome):
     max_ix_onsets = np.argmax(onsets)
     possible_delays = (np.where(metronome>0)[0])-max_ix_onsets
     delay_ix = np.argmin(np.abs(possible_delays))
