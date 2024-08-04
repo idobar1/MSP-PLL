@@ -9,8 +9,19 @@ def normalize_signal(samples):
 def synth_square(t_vec, f, d_c=0.5):
     return ((ss.square(2 * np.pi * f * t_vec, d_c) + 1)/2)
 
-def jumping_tempo_square():
-    pass
+def two_freqs_sines(f1, dur1, f2, dur2, fs):
+    t1 = np.arange(0, dur1, 1/fs)
+    t2 = np.arange(0, dur2, 1/fs)
+    sin1 = np.sin(2 * np.pi * f1 * t1)
+    sin2 = np.sin(2 * np.pi * f2 * t2)
+    return np.concatenate((sin1, sin2))
+
+def two_freqs_squares(f1, dur1, f2, dur2, fs):
+    t1 = np.arange(0, dur1, 1/fs)
+    t2 = np.arange(0, dur2, 1/fs)
+    sq_wave1 = synth_square(t1, f1)
+    sq_wave2 = synth_square(t2, f2)
+    return np.concatenate((sq_wave1, sq_wave2))
 
 def plot_est_spectrum(x,fs,nperseg=65536):
     f, Pxx_left = ss.welch(x,fs,nperseg=nperseg)

@@ -61,7 +61,7 @@ def main():
     plt.title('s(t) - the raw samples of the left channel')
     plt.show()
     
-    math_config_list = [  # TODO for each input we'll have this list of these configs. In the end we'll have 2 plots for each config
+    math_config_list = [
     MathConfig(loop_gain = 1, 
         loop_filt_type = FiltType.MA, 
         loop_filter_mem = 20000, 
@@ -100,7 +100,7 @@ def main():
 
     ### Input 2: Sine Wave ###
     
-    # math_config_list = [  # TODO for each input we'll have this list of these configs. In the end we'll have 2 plots for each config
+    # math_config_list = [
     # MathConfig(loop_gain = 0.0025, 
     #     loop_filt_type = FiltType.GAIN, 
     #     loop_filter_mem = 20000, 
@@ -155,7 +155,7 @@ def main():
     # plt.show()
 
     ### Input 4: Square Wave, dc = 0.1 ###
-    # math_config_list = [  # TODO for each input we'll have this list of these configs. In the end we'll have 2 plots for each config
+    # math_config_list = [
     # MathConfig(loop_gain = 10, 
     #     loop_filt_type = FiltType.GAIN, 
     #     loop_filter_mem = 44100, 
@@ -195,5 +195,102 @@ def main():
     #     plt.plot(t, e_t)
     #     plt.title('e_t for square wave (10%) input\n' + math_config.config_to_str())
     #     plt.show()
+
+    ### Input 5:  2 Freqs Sine Wave ###
+    
+    # math_config_list = [
+    #     MathConfig(
+    #         loop_gain = 0.002,
+    #         loop_filt_type = FiltType.MA, 
+    #         loop_filter_mem = 20000, 
+    #         VCO_gain = 2*np.pi/100, 
+    #         f0=2
+    #     ),
+    #     MathConfig(
+    #         loop_gain = 0.002, 
+    #         loop_filt_type = FiltType.GAIN, 
+    #         loop_filter_mem = 20000, 
+    #         VCO_gain = 2*np.pi/100, 
+    #         f0=2
+    #     )
+    # ]
+    # sin1_len = 10  # sec
+    # sin2_len = 10  # sec
+    # f1_input = 1.8
+    # f2_input = 2.3
+    # fs = 44100
+    # two_freqs_sin_input = math_utils.two_freqs_sines(f1_input, sin1_len, f2_input, sin2_len, fs)
+    # t = np.arange(0, sin1_len+sin2_len, 1/fs)
+    # plt.figure()
+    # plt.plot(t, two_freqs_sin_input)
+    # plt.title(f's(t) - two freqs sine wave - {f1_input}[Hz] and {f2_input}[Hz]')
+    # plt.show()
+    # O_t = math_utils.onset_func(two_freqs_sin_input) 
+    # plt.figure()
+    # plt.plot(t, O_t)
+    # plt.title('O(t) - Onsets of two freqs sine wave')
+    # plt.show()
+    # for math_config in math_config_list:
+    #     e_t, x_t = math_utils.PLL(two_freqs_sin_input, fs, math_config)   
+    #     plt.figure()
+    #     plt.plot(t, two_freqs_sin_input, label="two freqs sine input")
+    #     plt.plot(t, x_t, label="output")
+    #     plt.legend()
+    #     plt.title('Two Freqs Sine input & Output Signals\n' + math_config.config_to_str() + '\nf1_input = ' + str(f1_input)+ '\nf2_input = ' + str(f2_input))
+    #     plt.show()    
+    #     plt.figure()
+    #     plt.plot(t, e_t)
+    #     plt.title('e_t for two freqs sine input\n' + math_config.config_to_str() + '\nf1_input = ' + str(f1_input) + '\nf2_input = ' + str(f2_input))
+    #     plt.show()
+
+    ### Input 6:  2 Freqs Square Wave ###
+    
+    # math_config_list = [
+    #     MathConfig(
+    #         loop_gain = 0.004,
+    #         loop_filt_type = FiltType.MA, 
+    #         loop_filter_mem = 10000, 
+    #         VCO_gain = 2*np.pi/100, 
+    #         f0=2
+    #     ),
+    #     MathConfig(
+    #         loop_gain = 0.004, 
+    #         loop_filt_type = FiltType.GAIN, 
+    #         loop_filter_mem = 10000, 
+    #         VCO_gain = 2*np.pi/100, 
+    #         f0=2
+    #     )
+    # ]
+    # sin1_len = 10  # sec
+    # sin2_len = 10  # sec
+    # f1_input = 1.8
+    # f2_input = 2.2
+    # fs = 44100
+    # two_freqs_sin_input = math_utils.two_freqs_squares(f1_input, sin1_len, f2_input, sin2_len, fs)
+    # t = np.arange(0, sin1_len+sin2_len, 1/fs)
+    # plt.figure()
+    # plt.plot(t, two_freqs_sin_input)
+    # plt.title(f's(t) - two freqs square wave - {f1_input}[Hz] and {f2_input}[Hz]')
+    # plt.show()
+    # O_t = math_utils.onset_func(two_freqs_sin_input) 
+    # plt.figure()
+    # plt.plot(t, O_t)
+    # plt.title('O(t) - Onsets of two freqs square wave ')
+    # plt.show()
+    # for math_config in math_config_list:
+    #     e_t, x_t = math_utils.PLL(two_freqs_sin_input, fs, math_config)   
+    #     plt.figure()
+    #     plt.plot(t, two_freqs_sin_input, label="two freqs square wave input")
+    #     plt.plot(t, x_t, label="output")
+    #     plt.legend()
+    #     plt.title('Two Freqs square wave input & Output Signals\n' + math_config.config_to_str() + '\nf1_input = ' + str(f1_input)+ '\nf2_input = ' + str(f2_input))
+    #     plt.show()    
+    #     plt.figure()
+    #     plt.plot(t, e_t)
+    #     plt.title('e_t for two freqs square wave input\n' + math_config.config_to_str() + '\nf1_input = ' + str(f1_input) + '\nf2_input = ' + str(f2_input))
+    #     plt.show()
+        
+
+
 if __name__ == "__main__":
     main()
