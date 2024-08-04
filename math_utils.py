@@ -36,7 +36,7 @@ def loop_filter(theta, t, filt_type, math_config, T=10):
             e_t = (1/(t + 1))*np.sum(theta[0:t+1]) * math_config.loop_gain
         else:
             e_t = (1/T)*np.sum(theta[t-T:t]) * math_config.loop_gain
-    elif(filt_type == "gain"):
+    elif(filt_type == "GAIN"):
         e_t = theta[t] * math_config.loop_gain
     else:
         print("Invalid filt_type")
@@ -103,8 +103,9 @@ def sync_metronome(metronome, onset, fs, num_of_sec_trim):
     return metronome_synched
 
 def add_metronome_with_sound(metronome, signal, t, fs):
-    m_t = np.convolve(metronome, np.ones((int(fs*0.1))), mode="same" )
-    m_t_mod = np.multiply(m_t, np.cos(2*np.pi*440*t) + 0.25*np.cos(2*np.pi*440*3/2*t) + 0.1*np.cos(2*np.pi*440*5/4*t))
-    m_t_mod = 2*m_t_mod/np.max(np.abs(m_t_mod))
+    m_t = np.convolve(metronome, np.ones((int(fs*0.03))), mode="same" )
+    # m_t_mod = np.multiply(m_t, np.cos(2*np.pi*440*t) + 0.25*np.cos(2*np.pi*440*3/2*t) + 0.1*np.cos(2*np.pi*440*5/4*t))
+    m_t_mod = np.multiply(m_t, np.cos(2*np.pi*329.62*t) + np.cos(2*np.pi*659.24*t)+ 0.8*np.cos(2*np.pi*392*t) + 0.6*np.cos(2*np.pi*493.88*t))
+    m_t_mod = m_t_mod/np.max(np.abs(m_t_mod))
     x_t_save_2 = m_t_mod + signal
     return m_t_mod, x_t_save_2

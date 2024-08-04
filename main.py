@@ -31,10 +31,11 @@ def main():
     FileConfig = Config.FileConfig
     DebugConfig = Config.DebugConfig
 
-    ### Input 1: Music signal ###
+    ## Input 1: Music signal ###
+    
     fname = FileConfig.fname
     format = FileConfig.format
-    
+        
     audio, samples, num_of_channels, fs = open_audio.open_audio_file(fname, format)
     if num_of_channels == 2:
         left_ch, right_ch = open_audio.separate_channels(samples)
@@ -54,46 +55,84 @@ def main():
     t = np.arange(0,cut_len_sec,1/fs)
     s_t = normalize_signal(processing_samples)
     O_t = math_utils.onset_func(s_t)
-    e_t, x_t = math_utils.PLL(O_t, fs, math_config)
-    metronome = metronome_thresholding(x_t)
-    synched_metronome = math_utils.sync_metronome(metronome, O_t, fs, 1)
 
-    sound_to_save, sound_metronome = add_metronome_with_sound(synched_metronome, s_t, t, fs)
-    
-    x_t_audio = AudioSegment(
-    ((sound_to_save*32767/max(abs(sound_to_save))).astype('int16')).tobytes(),
-    frame_rate=fs,
-    sample_width=samples.dtype.itemsize, 
-    channels=1) 
-    
-
-    x_t_audio.export("Music and Metronome.wav", format="wav")
     plt.figure()
-    plt.plot(t, O_t)
-    plt.plot(t, synched_metronome)
-    plt.title('Onset Function & synched metronome')
+    plt.plot(t, s_t)
+    plt.title('s(t) - the raw samples of the left channel')
     plt.show()
+    
+    math_config_list = [  # TODO for each input we'll have this list of these configs. In the end we'll have 2 plots for each config
+    MathConfig(loop_gain = 1, 
+        loop_filt_type = FiltType.MA, 
+        loop_filter_mem = 20000, 
+        VCO_gain = 2*np.pi/100, 
+        f0=2.1)
+                            ]
+    for math_config in math_config_list:
+        e_t, x_t = math_utils.PLL(O_t, fs, math_config)
+        metronome = metronome_thresholding(x_t)
+        synched_metronome = math_utils.sync_metronome(metronome, O_t, fs, 1)
+
+        metronome_sound, song_w_metro = add_metronome_with_sound(synched_metronome, s_t, t, fs)
+        song_w_metro_audio = AudioSegment(
+        ((song_w_metro*32767/max(abs(song_w_metro))).astype('int16')).tobytes(),
+        frame_rate=fs,
+        sample_width=samples.dtype.itemsize, 
+        channels=1) 
+        
+
+        song_w_metro_audio.export("Music and Metronome.wav", format="wav")
+        plt.figure()
+        plt.plot(t, O_t)
+        plt.plot(t, synched_metronome)
+        plt.title('Onset Function & synched metronome')
+        plt.show()
+        
+        plt.figure()
+        plt.plot(t, metronome_sound)
+        plt.title('metronome sound')
+        plt.show()
+        
+        plt.figure()
+        plt.plot(t, e_t)
+        plt.title('e_t for Another One bites The Dust input')
+        plt.show()
 
     ### Input 2: Sine Wave ###
-    # sin_len = 5  # sec
-    # f_sin = 2
+    
+    # math_config_list = [  # TODO for each input we'll have this list of these configs. In the end we'll have 2 plots for each config
+    # MathConfig(loop_gain = 0.0025, 
+    #     loop_filt_type = FiltType.GAIN, 
+    #     loop_filter_mem = 20000, 
+    #     VCO_gain = 2*np.pi/100, 
+    #     f0=2)
+    #                         ]
+    # sin_len = 10  # sec
+    # f_input = 1.4
     # fs = 44100
     # t = np.arange(0, sin_len, 1/fs)
-    # sin_input = np.sin(2 * np.pi * f_sin * t)
-    # sin_input_normalized = normalize_signal(sin_input)
-    # e_t, x_t = math_utils.PLL(sin_input_normalized, fs)
-    # metronome = metronome_thresholding(x_t)
-
+    # sin_input = np.sin(2 * np.pi * f_input * t)
     # plt.figure()
-    # plt.plot(t, sin_input, label="sine input")
-    # plt.plot(t, x_t, label="output")
-    # plt.legend()
-    # plt.title('Sine input & Output Signals')
-    # plt.show()    
-    # plt.figure()
-    # plt.plot(t, e_t)
-    # plt.title('e_t for sine input')
+    # plt.plot(t, sin_input)
+    # plt.title('s(t) - sine wave')
     # plt.show()
+    # O_t = math_utils.onset_func(sin_input) 
+    # plt.figure()
+    # plt.plot(t, O_t)
+    # plt.title('O(t) - Onsets of sine wave')
+    # plt.show()
+    # for math_config in math_config_list:
+    #     e_t, x_t = math_utils.PLL(sin_input, fs, math_config)   
+    #     plt.figure()
+    #     plt.plot(t, sin_input, label="sine input")
+    #     plt.plot(t, x_t, label="output")
+    #     plt.legend()
+    #     plt.title('Sine input & Output Signals\n' + math_config.config_to_str() + '\nf_input = ' + str(f_input))
+    #     plt.show()    
+    #     plt.figure()
+    #     plt.plot(t, e_t)
+    #     plt.title('e_t for sine input\n' + math_config.config_to_str() + '\nf_input = ' + str(f_input))
+    #     plt.show()
 
     ### Input 3: Square Wave, dc = 0.5 ###
     # sq_len = 10  # sec
@@ -116,36 +155,45 @@ def main():
     # plt.show()
 
     ### Input 4: Square Wave, dc = 0.1 ###
-    math_config_list = [  # TODO for each input we'll have this list of these configs. In the end we'll have 2 plots for each config
-    MathConfig(loop_gain = 0.01, 
-        loop_filt_type = FiltType.MA, 
-        loop_filter_mem = 22050, 
-        VCO_gain = 2*np.pi/100, 
-        f0=1.8),
-    MathConfig(loop_gain = 0., 
-        loop_filt_type = FiltType.MA, 
-        loop_filter_mem = 1000, 
-        VCO_gain = 2*np.pi/100, 
-        f0=1.8),
-                            ]
-    for math_config in math_config_list:
-        sq_len = 10  # sec
-        f = 2
-        fs = 44100
-        t = np.arange(0, sq_len, 1/fs)
-        sq_01 = math_utils.synth_square(t, f, 0.1)
-        sin_input_normalized = normalize_signal(sq_01)
-        e_t, x_t = math_utils.PLL(sin_input_normalized, fs, math_config)
+    # math_config_list = [  # TODO for each input we'll have this list of these configs. In the end we'll have 2 plots for each config
+    # MathConfig(loop_gain = 10, 
+    #     loop_filt_type = FiltType.GAIN, 
+    #     loop_filter_mem = 44100, 
+    #     VCO_gain = 2*np.pi/100, 
+    #     f0=1.9),
+    # MathConfig(loop_gain = 0.0001, 
+    #     loop_filt_type = FiltType.MA, 
+    #     loop_filter_mem = 1000, 
+    #     VCO_gain = 2*np.pi/100, 
+    #     f0=1.8),
+                            # ]
+    # for math_config in math_config_list:
+    #     sq_len = 10  # sec
+    #     f = 2
+    #     fs = 44100
+    #     t = np.arange(0, sq_len, 1/fs)
+    #     sq_01 = math_utils.synth_square(t, f, 0.1)
+    #     s_t =  normalize_signal(sq_01)
+    #     plt.figure()
+    #     plt.plot(t, s_t)
+    #     plt.title('s(t) - square wave 0.1')
+    #     plt.show()
+    #     O_t = math_utils.onset_func(s_t)
+    #     plt.figure()
+    #     plt.plot(t, O_t)
+    #     plt.title('O(t) - Onsets of square wave 0.1')
+    #     plt.show()
+    #     e_t, x_t = math_utils.PLL(O_t, fs, math_config)
 
-        plt.figure()
-        plt.plot(t, sq_01, label="square wave input")
-        plt.plot(t, x_t, label="output")
-        plt.legend()
-        plt.title('Square Wave Input & Output Signals')
-        plt.show()    
-        plt.figure()
-        plt.plot(t, e_t)
-        plt.title('e_t for square wave (10%) input')
-        plt.show()
+    #     plt.figure()
+    #     plt.plot(t, sq_01, label="square wave input")
+    #     plt.plot(t, x_t, label="output")
+    #     plt.legend()
+    #     plt.title('Square Wave Input & Output Signals\n' + math_config.config_to_str())
+    #     plt.show()    
+    #     plt.figure()
+    #     plt.plot(t, e_t)
+    #     plt.title('e_t for square wave (10%) input\n' + math_config.config_to_str())
+    #     plt.show()
 if __name__ == "__main__":
     main()

@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 import numpy as np
-from attr import frozen
+# from attr import frozen
 from strenum import StrEnum
 
 
@@ -8,7 +8,7 @@ class FiltType(StrEnum):
     MA = "MA"
     GAIN = "GAIN"
 
-@frozen
+# @frozen
 class Config:
     class FileConfig:
         fname = "Queen - Another One Bites the Dust.mp3"
