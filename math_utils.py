@@ -1,7 +1,6 @@
 import numpy as np
 import scipy.signal as ss
 import matplotlib.pyplot as plt 
-from config import Config
 
 def normalize_signal(samples):
     return samples/np.max(samples)

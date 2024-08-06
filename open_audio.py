@@ -1,11 +1,6 @@
 from pydub import AudioSegment
 import numpy as np
-import matplotlib.pyplot as plt 
 from math_utils import *
-import sounddevice as sd
-
-from scipy.io.wavfile import write as write_wav
-from pydub.playback import play
 
 def open_audio_file(fname, format):
     audio = AudioSegment.from_file(fname,format=format)

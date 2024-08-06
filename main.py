@@ -2,7 +2,6 @@ from pydub import AudioSegment
 import numpy as np
 import matplotlib.pyplot as plt 
 from math_utils import *
-import sounddevice as sd
 from config import FiltType, Config
 import math_utils
 import open_audio
