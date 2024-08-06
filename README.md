@@ -1,5 +1,18 @@
 # How to run
-## 1. Comment and Uncomment Relevant Parts
+
+## 1. Prerequisites
+pip install pydub
+
+pip install strenum
+
+pip install numpy
+
+pip install scipy
+
+pip install matplotlib
+
+
+## 2. Comment and Uncomment Relevant Parts
 Open main.py, uncomment uncomment the relevant section, for example:
 
 between: ### Input 4: Square Wave, dc = 0.1 ###
@@ -21,13 +34,13 @@ The rest of the sections: comment out
 
 5. After finished, the file 'Music and Metronome.wav' will be created. Run it to listen to the song with the metronome sound.
 
-## 2. Choose PLL parameters
+## 3. Choose PLL parameters
 At the beginning of the chosen section, configure the MathConfig instances as you wish
 loop_gain, filt_type (can be either FiltType.GAIN or FiltType.MA), loop_filter_mem (memory for moving average), VCO_gain and f0.
 
 You can add more instances to math_config_list if you wish to run more examples.
 
-## 3. Run
+## 4. Run
 run `python main.py`
 
 Guide to download & install ffmpeg (relevant for python libraries dealing with files including mp3 which belongs to MPEG):
